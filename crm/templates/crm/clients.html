@@ -1,0 +1,13 @@
+<!-- crm/templates/crm/clients.html -->
+
+<h1>Clients</h1>
+<ul>
+    {% for client in clients %}
+    <li>
+        <h2>{{ client.name }}</h2>
+        <p>Email: {{ client.email }}</p>
+        <p>Phone: {{ client.phone }}</p>
+        <p>Address: {{ client.address }}</p>
+    </li>
+    {% endfor %}
+</ul>

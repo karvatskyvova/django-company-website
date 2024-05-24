@@ -1,0 +1,12 @@
+<!-- services/templates/services/services.html -->
+
+<h1>Our Services</h1>
+<ul>
+    {% for service in services %}
+    <li>
+        <h2>{{ service.name }}</h2>
+        <p>{{ service.description }}</p>
+        <p>Price: {{ service.price }}</p>
+    </li>
+    {% endfor %}
+</ul>
