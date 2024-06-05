@@ -1,13 +1,14 @@
-# .github/workflows/ci.yml
-
 name: Django CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
   build:
-
-    runs-on: linux-latest
+    runs-on: ubuntu-latest
 
     services:
       postgres:
@@ -38,9 +39,38 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run tests
+    - name: Run migrations
       env:
         DATABASE_URL: postgres://user:password@localhost:5432/company_website
       run: |
         python manage.py migrate
+
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://user:password@localhost:5432/company_website
+      run: |
         python manage.py test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Heroku
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        echo "machine api.heroku.com" > ~/.netrc
+        echo "  login ${{ secrets.HEROKU_EMAIL }}" >> ~/.netrc
+        echo "  password ${{ secrets.HEROKU_API_KEY }}" >> ~/.netrc
+        echo "machine git.heroku.com" >> ~/.netrc
+        echo "  login ${{ secrets.HEROKU_EMAIL }}" >> ~/.netrc
+        echo "  password ${{ secrets.HEROKU_API_KEY }}" >> ~/.netrc
+        heroku git:remote -a your-app-name
+
+    - name: Deploy to Heroku
+      run: |
+        git push heroku main
